@@ -8,9 +8,11 @@ Link Git: https://github.com/tiagotorres00/AED1/tree/main/senha
 
 
 O que funciona: 
+
 -Código consegue validar ou invalidar a senha
 
 O que não funciona:
+
 -Senhas maiores que 50 caracteres
 
 Lista de testes:
