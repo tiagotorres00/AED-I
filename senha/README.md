@@ -1,4 +1,4 @@
-Nome: Tiago Torres
+Nome: Tiago Torres\n
 Regras do código: C Style Guide - NASA
 Exercício: Validar uma senha
 Link Git: https://github.com/tiagotorres00/AED1/tree/main/senha
