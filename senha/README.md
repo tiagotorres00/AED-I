@@ -20,7 +20,7 @@ Lista de testes:
     password;
     passWord;
     Password1;
-    PassWord1!;
+    PassWord1!
 
 Testes DrMemory:
     ...
