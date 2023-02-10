@@ -9,7 +9,7 @@ bool validar(char *senha);
 
 int main(void)
 {
-    char *senha[50];
+    char senha[50];
     printf("Digite sua senha:");
     scanf("%s", senha);
 
