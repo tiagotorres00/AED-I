@@ -26,7 +26,7 @@ int menu(void)
 {
     int opcao;
 
-    do
+    while (1)
     {
         printf("\n");
         printf("1- Adicionar nome\n");
@@ -34,30 +34,26 @@ int menu(void)
         printf("3- Listar\n");
         printf("4- Sair\n");
         scanf("%i", &opcao);
-    } 
-    while (opcao < 1 || opcao > 4);
 
-    switch (opcao)
-    {
-        case 1:
-            adicionarNome();
-            break;
-        
-        case 2:
-            removerNome();
-            break;
-        
-        case 3:
-            listar();
-            break;
-        
-        case 4:
-            return 4;
+        switch (opcao)
+        {
+            case 1:
+                adicionarNome();
+                break;
+            
+            case 2:
+                removerNome();
+                break;
+            
+            case 3:
+                listar();
+                break;
+            
+            case 4:
+                return 4;
+        }
     }
-
-    menu();
 }
-
 
 void adicionarNome(void)
 {
