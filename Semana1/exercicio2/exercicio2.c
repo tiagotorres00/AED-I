@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-int Menu(void);
-void AdicionarNome(void);
-void RemoverNome(void);
-void Listar(void);
-
+int menu(void);
+void adicionarNome(void);
+void removerNome(void);
+void listar(void);
 
 char *string;
 int tamanhoString = 0;
@@ -15,7 +13,7 @@ int numeroNomes = 0;
 
 int main(void)
 {
-    int opcao = Menu();
+    int opcao = menu();
 
     if (opcao == 4)
     {
@@ -24,7 +22,7 @@ int main(void)
     }
 }
 
-int Menu(void)
+int menu(void)
 {
     int opcao;
 
@@ -42,25 +40,26 @@ int Menu(void)
     switch (opcao)
     {
         case 1:
-            AdicionarNome();
+            adicionarNome();
             break;
         
         case 2:
-            RemoverNome();
+            removerNome();
             break;
         
         case 3:
-            Listar();
+            listar();
             break;
         
         case 4:
             return 4;
     }
 
-    Menu();
+    menu();
 }
 
-void AdicionarNome(void)
+
+void adicionarNome(void)
 {
     char nome[30];
 
@@ -68,7 +67,7 @@ void AdicionarNome(void)
     scanf("%s", &nome);
 
     int tamanhoNome = strlen(nome) + 1;
-    string = realloc(string, tamanhoString + (sizeof(char) * tamanhoNome));
+    string = realloc(string, tamanhoString + (sizeof(char) * tamanhoNome)); 
 
     if (!string)
     {
@@ -76,6 +75,7 @@ void AdicionarNome(void)
         exit(1);
     }
 
+    // Copia o nome digitado pelo usuario para a string unica
     for (int i = tamanhoString, j = 0; i < (tamanhoString + tamanhoNome); i++)
     {
         string[i] = nome[j];
@@ -86,7 +86,8 @@ void AdicionarNome(void)
     numeroNomes++;
 }
 
-void RemoverNome(void)
+
+void removerNome(void)
 {
     char nome[30];
 
@@ -95,20 +96,24 @@ void RemoverNome(void)
 
     int tamanhoNome = strlen(nome) + 1;
 
+    // Passa por todas as letras da string ate encontrar a letra inicial do nome a ser removido
     for (int i = 0; i < tamanhoString; i++)
     {
+        // Quando encontra:
         if (nome[0] == string[i])
         {
-            int counter = 0;
+            // Compara as proximas n letras. Contador usado para verificar se todas as letras coincidem 
+            int contador = 0;
             for (int j = 0; j < tamanhoNome; j++)
             {
                 if (nome[j] == string[i + j])
                 {
-                    counter++;
+                    contador++;
                 }
             }
 
-            if (counter == tamanhoNome)
+            // Se todas as letras coincidem, "apaga" o nome e reorganiza os proximos caracteres para nao ficar um espaco vazio no meio da string
+            if (contador == tamanhoNome)
             {
                 for (int j = i; j < (tamanhoString - tamanhoNome); j++)
                 {
@@ -118,7 +123,14 @@ void RemoverNome(void)
         }
     }
 
-    string = realloc(string, (tamanhoString - tamanhoNome));
+    if (tamanhoString - tamanhoNome < 1)
+    {
+        string = realloc(string, 1);
+    }
+    else
+    {
+        string = realloc(string, (tamanhoString - tamanhoNome));
+    }
 
     if (!string)
     {
@@ -126,31 +138,13 @@ void RemoverNome(void)
         exit(1);
     }
 
+
     tamanhoString -= tamanhoNome;
     numeroNomes--;
 }
 
-void Listar(void)
+void listar(void)
 {
-    int indexPrimeiraLetra[numeroNomes];
-    indexPrimeiraLetra[0] = 0;
-
-    int counter = 1;
-
-    for (int i = 1, j = 1; i < tamanhoString; i++)
-    {
-        if (counter == numeroNomes)
-        {
-            break;
-        }
-        else if (string[i - 1] == '\0')
-        {
-            indexPrimeiraLetra[j] = i;
-            j++;
-            counter++;
-        }
-    }
-
     for (int i = 0, j = 0; i < tamanhoString; i++)
     {
         if (string[i] == '\0')
