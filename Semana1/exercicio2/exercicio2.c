@@ -70,6 +70,12 @@ void AdicionarNome(void)
     int tamanhoNome = strlen(nome) + 1;
     string = realloc(string, tamanhoString + (sizeof(char) * tamanhoNome));
 
+    if (!string)
+    {
+        printf("Erro ao realocar memoria.");
+        exit(1);
+    }
+
     for (int i = tamanhoString, j = 0; i < (tamanhoString + tamanhoNome); i++)
     {
         string[i] = nome[j];
@@ -113,6 +119,13 @@ void RemoverNome(void)
     }
 
     string = realloc(string, (tamanhoString - tamanhoNome));
+
+    if (!string)
+    {
+        printf("Erro ao realocar memoria.");
+        exit(1);
+    }
+
     tamanhoString -= tamanhoNome;
     numeroNomes--;
 }
