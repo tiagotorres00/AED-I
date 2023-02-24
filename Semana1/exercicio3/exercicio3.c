@@ -47,6 +47,7 @@ int main(int argc, char const *argv[])
                 break;
             
             case 4:
+                free(pBuffer);
                 exit(1);
         }
     }
@@ -118,7 +119,7 @@ void removerPessoa(void *pBuffer, int *pTamanhoBuffer)
                 printf("Erro ao realocar memoria.\n");
                 exit(1);
             }
-            
+
             *((int *)pBuffer) -= 1;
             *pTamanhoBuffer -= (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)); 
             return;
