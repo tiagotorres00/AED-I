@@ -1,11 +1,3 @@
-/*
-Faça uma agenda capaz de incluir, apagar, buscar e listar quantas pessoas o usuário desejar, 
-porém, toda a informação incluída na agenda deve ficar num único lugar chamado: “void *pBuffer”.
-
-Não pergunte para o usuário quantas pessoas ele vai incluir.
-Não pode alocar espaço para mais pessoas do que o necessário.
-Cada pessoa tem nome[10], idade e telefone.
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,14 +58,12 @@ int main(int argc, char const *argv[])
 void adicionarPessoa(void *pBuffer, int *pTamanhoBuffer)
 {
     int p = *pTamanhoBuffer;
-    pBuffer = realloc(pBuffer, *pTamanhoBuffer + (10 * sizeof(char)) + sizeof(int) + (10 * sizeof(char)));
+    pBuffer = realloc(pBuffer, *pTamanhoBuffer + (10 * sizeof(char)) + 4 * sizeof(char) + (10 * sizeof(char)));
     if (!pBuffer)
     {
         printf("Erro ao realocar memoria.\n");
         exit(1);
     }
-
-    *((int *)pBuffer) += 1;
 
     char nome[10];
 
@@ -85,56 +75,62 @@ void adicionarPessoa(void *pBuffer, int *pTamanhoBuffer)
     p += (10 * sizeof(char));
     
     printf("Digite a idade: ");
-    scanf("%i", &(*((int *)pBuffer + p)));
+    scanf("%s", &(*((char *)pBuffer + p)));
 
-    p += sizeof(int);
+    p += 4 * sizeof(char);
 
     char telefone[10];
     printf("Digite o telefone: ");
     scanf("%s", telefone);
     strcpy(((char *)pBuffer + p), telefone);
 
-
-    *pTamanhoBuffer += 10 * sizeof(char) + sizeof(int) + 10 * sizeof(char);
+    // Atualiza as variaveis
+    *((int *)pBuffer) += 1;
+    *pTamanhoBuffer += 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char);
 }
 
 void removerPessoa(void *pBuffer, int *pTamanhoBuffer)
 {   
+    int nPessoas = *((int *)pBuffer);
     int p = sizeof(int);
-
     char nome[10];
 
     printf("Digite o nome da pessoa: ");
     scanf("%s", nome);
 
     int n = strlen(nome);
-    for (int i = p; i < *pTamanhoBuffer; i++) // possivel otimizar fazendo i pular de 18 em 18 bytes (tamanho da pessoa)!!
+    
+    for (int i = 0; i < nPessoas; i++)
     {
-        int counter = 0;
-        if (*((char *)pBuffer + i) == nome[0])
+        // Se encontrar o nome da pessoa
+        if (strcmp((pBuffer + p), nome) == 0)
         {
-            for (int j = i; j < n; j++)
-            {
-                if (*((char *) pBuffer + j) == nome[j])
-                {
-                    counter++;
-                }
+            // Se o nome da pessoa estiver no inicio ou meio do buffer, eh necessario "puxar" e reorganizar a memoria do buffer
+            if (!(p == *pTamanhoBuffer - 24))
+            {   
+                memcpy(((char *)pBuffer + p), ((char *)pBuffer + p + 24), *pTamanhoBuffer - p);
             }
 
-            if (counter == n)
+            // Caso o nome esteja no final, ou os dados ja foram reorganizados, excluir a parte final do buffer e atualizar as variaveis
+            pBuffer = realloc(pBuffer, *pTamanhoBuffer - (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)));
+            if (!pBuffer)
             {
-                for (int j = i; j < (*pTamanhoBuffer - ((10 * sizeof(char)) + sizeof(int) + 10 * sizeof(char))); j++)
-                {
-                    *((char *)pBuffer + j) = *((char *)pBuffer + j + ((10 * sizeof(char)) + sizeof(int) + 10 * sizeof(char))); // como tirar o char *
-                }
-                break;
+                printf("Erro ao realocar memoria.\n");
+                exit(1);
             }
+            
+            *((int *)pBuffer) -= 1;
+            *pTamanhoBuffer -= (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)); 
+            return;
+        }
+        else
+        {
+            // Pula direto para o proximo nome
+            p += (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char));
         }
     }
 
-    *((int *)pBuffer) -= 1; // Atualiza o numero de pessoas no buffer
-    pBuffer = realloc(pBuffer, *pTamanhoBuffer - (10 * sizeof(char) + sizeof(int) + 10 * sizeof(char)));
-    *pTamanhoBuffer -= (10 * sizeof(char) + sizeof(int) + 10 * sizeof(char)); 
+    printf("Nome nao encontrado. Tente novamente.\n");
 }
 
 void listar(void *pBuffer)
@@ -148,8 +144,8 @@ void listar(void *pBuffer)
         printf("Contato %i: \n", i);
         printf("Nome: %s\n", (pBuffer + p));
         p += 10 * sizeof(char);
-        printf("Idade: %i\n", *((int *)pBuffer + p));
-        p += sizeof(int);
+        printf("Idade: %s\n", (pBuffer + p));
+        p += 4 * sizeof(char);
         printf("Telefone: %s\n\n", (pBuffer + p));
         p += 10 * sizeof(char);
     }
