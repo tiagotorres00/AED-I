@@ -26,6 +26,9 @@ int main(int argc, char const *argv[])
         printf("Falso");
     }
 
+    free(evento1);
+    free(evento2);
+
     return 0;
 }
 
