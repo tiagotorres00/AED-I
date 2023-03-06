@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
     evento1[1] = "15:00";
 
     char** evento2 = (char**) malloc(10 * sizeof(char));
-    evento2[0] = "10:00";
+    evento2[0] = "09:30";
     evento2[1] = "11:00";
 
     int evento1Tamanho = 2;
