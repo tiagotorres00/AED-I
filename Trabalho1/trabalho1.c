@@ -6,12 +6,12 @@ bool haveConflict(char ** evento1, int evento1Tamanho, char ** evento2, int even
 
 int main(int argc, char const *argv[])
 {
-    char** evento1 = (char**) malloc(10 * sizeof(char));
+    char** evento1 = (char**) malloc(10 * sizeof(char*));
     evento1[0] = "18:00";
     evento1[1] = "19:00";
 
-    char** evento2 = (char**) malloc(10 * sizeof(char));
-    evento2[0] = "22:00";
+    char** evento2 = (char**) malloc(10 * sizeof(char*));
+    evento2[0] = "18:45";
     evento2[1] = "23:00";
 
     int evento1Tamanho = 2;
