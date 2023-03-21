@@ -2,16 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-void adicionarPessoa(void *pBuffer, int *pTamanhoBuffer);
-void removerPessoa(void *pBuffer, int *pTamanhoBuffer);
+void adicionarPessoa(void *pBuffer);
 void listar(void *pBuffer);
 
 int main(int argc, char const *argv[])
 {
-    int tamanhoBuffer = 0;
-    int *pTamanhoBuffer = &tamanhoBuffer;
-
-    void *pBuffer = malloc(sizeof(int));
+    void *pBuffer = malloc(sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int *) + sizeof(int *)); 
+    // Numero de contatos + Opcao + Ponteiro para o primeiro + ponteiro para o ultimo
 
     if (!pBuffer)
     {
@@ -19,28 +16,29 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    *((int *)pBuffer) = 0;
-    tamanhoBuffer += sizeof(int); // precisa ser em bytes e nao em elementos, pois o void anda de 1 em 1 byte
+    *((int *)pBuffer) = -1; // opcao = -1
+    *((int *)pBuffer + sizeof(int)) = 0; // numero de contatos = 0
+    *((int *)pBuffer + 2 * sizeof(int)) = 0; // tamanho da LISTA, precisa ser em bytes e nao em elementos, pois o void anda de 1 em 1 byte
+    *((int **)pBuffer + 3 * sizeof(int)) = NULL;                   // primeiro elemento da lista
+    *((int **)pBuffer + 3 * sizeof(int) + sizeof(int *)) = NULL;   // ultimo elemento da lista
 
+    /*
     while (1)
     {
-        int opcao;
         printf("\n");
         printf("1- Adicionar Nova Pessoa\n");
         printf("2- Apagar Pessoa\n");
         printf("3- Listar\n");
         printf("4- Sair\n");
-        scanf("%i", &opcao);
 
-        switch (opcao)
+        switch (opcao) // switch OPCAO
         {
             case 1:
-                adicionarPessoa(pBuffer, pTamanhoBuffer);
+                adicionarPessoa(pBuffer);
                 break;
             
             case 2:
-                removerPessoa(pBuffer, pTamanhoBuffer);
-                break;
+                exit(1);
             
             case 3:
                 listar(pBuffer);
@@ -51,103 +49,82 @@ int main(int argc, char const *argv[])
                 exit(1);
         }
     }
+    */
+
+    adicionarPessoa(pBuffer);
+    adicionarPessoa(pBuffer);
+    adicionarPessoa(pBuffer);
+    listar(pBuffer);
 
 
     return 0;
 }
 
-void adicionarPessoa(void *pBuffer, int *pTamanhoBuffer)
+void adicionarPessoa(void *pBuffer)
 {
-    int p = *pTamanhoBuffer;
-    pBuffer = realloc(pBuffer, *pTamanhoBuffer + (10 * sizeof(char)) + 4 * sizeof(char) + (10 * sizeof(char)));
-    if (!pBuffer)
+    void *nodo = malloc(1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char) + 1 * sizeof(int *));
+    // NODO ANTERIOR + NOME[10] + IDADE[4] + TELEFONE[10] + PROXIMO NODO
+    if (!nodo)
     {
-        printf("Erro ao realocar memoria.\n");
+        printf("Erro ao alocar memoria.\n");
         exit(1);
     }
 
-    char nome[10];
-
-    printf("Digite o nome da pessoa: ");
-    scanf("%s", nome);
-
-    strcpy(((char *)pBuffer + p), nome);
-
-    p += (10 * sizeof(char));
-    
-    printf("Digite a idade: ");
-    scanf("%s", &(*((char *)pBuffer + p)));
-
-    p += 4 * sizeof(char);
-
-    char telefone[10];
-    printf("Digite o telefone: ");
-    scanf("%s", telefone);
-    strcpy(((char *)pBuffer + p), telefone);
-
-    // Atualiza as variaveis
-    *((int *)pBuffer) += 1;
-    *pTamanhoBuffer += 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char);
-}
-
-void removerPessoa(void *pBuffer, int *pTamanhoBuffer)
-{   
-    int nPessoas = *((int *)pBuffer);
-    int p = sizeof(int);
-    char nome[10];
-
-    printf("Digite o nome da pessoa: ");
-    scanf("%s", nome);
-
-    int n = strlen(nome);
-    
-    for (int i = 0; i < nPessoas; i++)
+    if (*((int **)pBuffer + 3 * sizeof(int)) == NULL) // se for o primeiro elemento da lista
     {
-        // Se encontrar o nome da pessoa
-        if (strcmp((pBuffer + p), nome) == 0)
-        {
-            // Se o nome da pessoa estiver no inicio ou meio do buffer, eh necessario "puxar" e reorganizar a memoria do buffer
-            if (!(p == *pTamanhoBuffer - 24))
-            {   
-                memcpy(((char *)pBuffer + p), ((char *)pBuffer + p + 24), *pTamanhoBuffer - p);
-            }
+        *((int **)nodo) = NULL; // anterior = NULL
 
-            // Caso o nome esteja no final, ou os dados ja foram reorganizados, excluir a parte final do buffer e atualizar as variaveis
-            pBuffer = realloc(pBuffer, *pTamanhoBuffer - (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)));
-            if (!pBuffer)
-            {
-                printf("Erro ao realocar memoria.\n");
-                exit(1);
-            }
+        printf("Digite o nome: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *))); // nodo + anterior
 
-            *((int *)pBuffer) -= 1;
-            *pTamanhoBuffer -= (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)); 
-            return;
-        }
-        else
-        {
-            // Pula direto para o proximo nome
-            p += (10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char));
-        }
+        printf("Digite a idade: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *) + 10 * sizeof(char))); // nodo + anterior + nome
+
+        printf("Digite o telefone: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char))); // nodo + anterior + nome + idade
+
+        *((int **)nodo + 1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)) = NULL; // proximo = NULL
+
+        *((int **)pBuffer + 3 * sizeof(int)) = nodo; // primeiro elemento da lista = nodo
+        *((int **)pBuffer + 3 * sizeof(int) + sizeof(int *)) = nodo; // ultimo elemento da lista = nodo
     }
+    else
+    {
+        *((int **)nodo) = (pBuffer + 3 * sizeof(int) + sizeof(int *)); // anterior do novo NODO = ultimo NODO da lista
+        *(*((int **)pBuffer + 3 * sizeof(int) + sizeof(int *)) + 1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)) = nodo; // proximo do ultimo NODO da lista = novo NODO
+        *((int **)pBuffer + 3 * sizeof(int) + sizeof(int *)) = nodo; // ultimo NODO da lista = novo NODO
 
-    printf("Nome nao encontrado. Tente novamente.\n");
+        printf("Digite o nome: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *))); // nodo + anterior
+
+        printf("Digite a idade: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *) + 10 * sizeof(char))); // nodo + anterior + nome
+
+        printf("Digite o telefone: ");
+        scanf("%s", ((char *)nodo + 1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char))); // nodo + anterior + nome + idade
+
+        *((int **)nodo + 1 * sizeof(int *) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)) = NULL; // proximo = NULL
+    }
 }
 
 void listar(void *pBuffer)
 {
-    int nPessoas = *((int *)pBuffer);
-    int p = sizeof(int);
-
-    for (int i = 0; i < nPessoas; i++)
+    void *atual = *((int **)pBuffer + 3 * sizeof(int)); // atual = primeiro da lista
+    
+    if (*((int **)pBuffer + 3 * sizeof(int)) == NULL)
     {
-        printf("\n");
-        printf("Contato %i: \n", i);
-        printf("Nome: %s\n", (pBuffer + p));
-        p += 10 * sizeof(char);
-        printf("Idade: %s\n", (pBuffer + p));
-        p += 4 * sizeof(char);
-        printf("Telefone: %s\n\n", (pBuffer + p));
-        p += 10 * sizeof(char);
+        printf("Agenda vazia.\n");
+        return;
+    }
+    else
+    {
+        while (*((int **)atual + 1 * sizeof(int **) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char)) != NULL) // while atual->prox != NULL
+        {
+            printf("\n");
+            printf("Nome: %s\n", (atual + 1 * sizeof(int **)));
+            printf("Idade: %s\n", (atual + 1 * sizeof(int **) + 10 * sizeof(char)));
+            printf("Telefone: %s\n", (atual + 1 * sizeof(int **) + 10 * sizeof(char) + 4 * sizeof(char)));
+            atual += 1 * sizeof(int **) + 10 * sizeof(char) + 4 * sizeof(char) + 10 * sizeof(char) + 1 * sizeof(int **);
+        }
     }
 }
