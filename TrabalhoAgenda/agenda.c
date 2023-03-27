@@ -9,7 +9,8 @@ void excluirLista(void *primeiro);
 
 int main(int argc, char const *argv[])
 {
-    void *pBuffer = (void *)malloc(2 * sizeof(void *) + 3 * sizeof(char));
+    void *pBuffer = (void *)malloc(2 * sizeof(void *) + 2 * sizeof(char));
+    // Aloca memoria para: o ponteiro para o primeiro elemento da lista, o ponteiro para o ultimo elemento da lista, string de 3 caracters
 
     if (!pBuffer)
     {
@@ -17,8 +18,9 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    *((void **)pBuffer) = NULL; // Primeiro NODO
-    *((void **)pBuffer + 1) = NULL;
+    *((void **)pBuffer) = NULL;     // pBuffer->First = NULL
+    *((void **)pBuffer + 1) = NULL; // pBuffer->Last = NULL
+
     //*((void **)pBuffer + sizeof(void *)) = NULL; // Ultimo NODO
 
     while (1)
@@ -28,7 +30,7 @@ int main(int argc, char const *argv[])
         printf("2 - Excluir contato\n");
         printf("3 - Listar\n");
         printf("4 - Sair\n");
-        scanf("%3s", (char *)pBuffer + 2 * sizeof(void *));
+        scanf("%1s", (char *)pBuffer + 2 * sizeof(void *));
 
         switch (((char *)pBuffer + 2 * sizeof(void *))[0])
         {
@@ -67,8 +69,8 @@ void novoContato(void *pBuffer)
         exit(1);
     }
 
-    *((void **)nodo) = NULL; // anterior = null
-    *((void **)nodo + 1) = NULL; // proximo = null
+    *((void **)nodo) = NULL;         // nodo->anterior = NULL
+    *((void **)nodo + 1) = NULL;     // nodo->proximo = NULL
     
     printf("Digite o nome: ");
     scanf("%9s", (char *)nodo + 2 * sizeof(void *)); // salva o nome apos os dois ponteiros
@@ -79,42 +81,47 @@ void novoContato(void *pBuffer)
     printf("Digite o telefone: ");
     scanf("%9s", (char *)nodo + 2 * sizeof(void *) + 10 * sizeof(char) + 4 * sizeof(char)); // salva o telefone apos a idade
 
-    if (*((void **)pBuffer) == NULL) // se FIRST->NULL
+    // Primeiro elemento da lista
+    if (*((void **)pBuffer) == NULL) // se pBuffer->First = NULL (Se a lista estiver vazia)
     {
-        *((void **)pBuffer) = nodo;                   // *head = nodo
-        *((void **)pBuffer + sizeof(void *)) = nodo;  // *tail = nodo
+        *((void **)pBuffer) = nodo;                   // pBuffer->First = NULL
+        *((void **)pBuffer + sizeof(void *)) = nodo;  // pBuffer->Last = NULL
         return;
     }
 
-    if (strcmp(nodo + 2 * sizeof(void *), *((void **)pBuffer) + 2 * sizeof(void *)) < 0) // name, (*head)->name
+    // Caso o novo contato deva se tornar o primeiro da lista
+    if (strcmp(nodo + 2 * sizeof(void *), *((void **)pBuffer) + 2 * sizeof(void *)) < 0) // compara nodo->nome com pBuffer->First->nome
     {
-        *((void **)nodo + sizeof(void *)) = *((void **)pBuffer); // nodo->prox = primeiro
-        *((void **)*((void **)pBuffer)) = nodo;                  // primeiro->ant = nodo
-        *((void **)pBuffer) = nodo;                   // primeiro = nodo
+        *((void **)nodo + sizeof(void *)) = *((void **)pBuffer);  // nodo->proximo = pBuffer->First
+        *((void **)*((void **)pBuffer)) = nodo;                   // pBuffer->First->anterior = nodo
+        *((void **)pBuffer) = nodo;                               // pBuffer->First = nodo
         return;
     }
 
-    if (strcmp(nodo + 2 * sizeof(void *), *((void **)pBuffer + sizeof(void *)) + 2 * sizeof(void *)) >= 0)
+    // Caso o novo contato deva se tornar o ultimo da lista
+    if (strcmp(nodo + 2 * sizeof(void *), *((void **)pBuffer + sizeof(void *)) + 2 * sizeof(void *)) >= 0) // compara nodo->nome com pBuffer->Last->nome
     {
-        *((void **)nodo) = *((void **)pBuffer + sizeof(void *));                     // nodo->ant = ultimo
-        *((void **)*((void **)pBuffer + sizeof(void *)) + sizeof(void *)) = nodo;    // ultimo->prox = nodo
-        *((void **)pBuffer + sizeof(void *)) = nodo;                                // ultimo = nodo
+        *((void **)nodo) = *((void **)pBuffer + sizeof(void *));                     // nodo->anterior = pBuffer->Last
+        *((void **)*((void **)pBuffer + sizeof(void *)) + sizeof(void *)) = nodo;    // pBuffer->Last->proximo = nodo
+        *((void **)pBuffer + sizeof(void *)) = nodo;                                 // pBuffer->Last = nodo
         return;
     }
 
-    void *atual = *((void **)pBuffer); // atual = primeiro da lista
-    void *proximo = *((void **)atual + sizeof(void *));
+    // Caso o novo contato deva entrar no meio da lista
+    void *atual = *((void **)pBuffer);                  // atual = primeiro da lista
+    void *proximo = *((void **)atual + sizeof(void *)); // proximo = segundo da lista
 
-    while (*((void **)atual + sizeof(void *)) != NULL && strcmp(nodo + 2 * sizeof(void *), proximo + 2 * sizeof(void *)) > 0)
+    // enquanto ATUAL NAO FOR O ULTIMO DA LISTA && nodo->nome deve ficar depois do proximo->nome
+    while (*((void **)atual + sizeof(void *)) != NULL && strcmp(nodo + 2 * sizeof(void *), proximo + 2 * sizeof(void *)) > 0) 
     {
-        atual = proximo;
-        proximo = *((void **)proximo + sizeof(void *));
+        atual = proximo;                                 // "anda" um elemento para o lado
+        proximo = *((void **)proximo + sizeof(void *)); 
     }
     
-    *((void **)nodo) = atual;                                                           // nodo->ant = atual
-    *((void **)nodo + sizeof(void *)) = *((void **)atual + sizeof(void *));             // nodo->prox = atual->prox
-    *((void **)*((void **)atual + sizeof(void *))) = nodo;                              // atual->prox->ant = nodo;
-    *((void **)atual + sizeof(void *)) = nodo;                                          // atual->prox = nodo;
+    *((void **)nodo) = atual;                                                           // nodo->anterior = atual
+    *((void **)nodo + sizeof(void *)) = *((void **)atual + sizeof(void *));             // nodo->proximo = atual->prox
+    *((void **)*((void **)atual + sizeof(void *))) = nodo;                              // atual->proximo->anterior = nodo
+    *((void **)atual + sizeof(void *)) = nodo;                                          // atual->proximo = nodo
 }
 
 void removerContato(void *pBuffer)
@@ -125,7 +132,7 @@ void removerContato(void *pBuffer)
         return;
     }
 
-    void *atual = *((void **)pBuffer); // atual = primeiro da lista
+    void *atual = *((void **)pBuffer);  // atual = primeiro da lista
     char *nome = (char *)malloc(10 * sizeof(char));
 
     printf("Digite o nome: ");
@@ -133,34 +140,35 @@ void removerContato(void *pBuffer)
 
     while (1)
     {
-        if (strcmp(atual + 2 * sizeof(void *), nome) == 0) // se encontrou o nome
+        if (strcmp(atual + 2 * sizeof(void *), nome) == 0) // busca o nome na lista
         {
-            if ((*((void **)atual) != NULL) && (*((void **)atual + sizeof(void *)) != NULL)) // se atual estiver no meio da lista
+            if ((*((void **)atual) != NULL) && (*((void **)atual + sizeof(void *)) != NULL)) // se atual estiver no MEIO DA LISTA
             {
                 void *anterior = *((void **)atual); 
                 void *proximo = *((void **)atual + sizeof(void *));
 
-                *((void **)anterior + sizeof(void *)) = proximo; // anterior aponta para o proximo
-                *((void **)proximo) = anterior; // proximo aponta para o anterior
+                *((void **)anterior + sizeof(void *)) = proximo; // anterior->proximo = proximo
+                *((void **)proximo) = anterior;                  // proximo->anterior = anterior
                 free(atual);
                 free(nome);
                 printf("Contato removido.\n");
                 return;
             }
-            else if (*((void **)atual) == NULL) // se o elemento anterior do atual for NULL (se atual for o priemiro da lista)
+            else if (*((void **)atual) == NULL) // se atual for o PRIMEIRO DA LISTA
             {
                 void *proximo = *((void **)atual + sizeof(void *));
 
-                if (proximo == NULL)
+                if (proximo == NULL) // se a lista so tiver UM CONTATO
                 {
-                    *((void **)pBuffer) = NULL;
-                    *((void **)pBuffer + sizeof(void *)) = NULL;
+                    *((void **)pBuffer) = NULL;                      // pBuffer->First = NULL
+                    *((void **)pBuffer + sizeof(void *)) = NULL;     // pBuffer->Last = NULL
                     free(atual);
                     free(nome);
                     printf("Contato removido.\n");
                     return;
                 }
-                
+
+                // se a lista tiver PELO MENOS DOIS CONTATOS
                 *((void **)proximo) = NULL;       // proximo->anterior = NULL
                 *((void **)pBuffer) = proximo;    // pBuffer->First = proximo;
                 free(atual);
@@ -168,18 +176,18 @@ void removerContato(void *pBuffer)
                 printf("Contato removido.\n");
                 return;
             }
-            else // se for o ultimo da lista
+            else // se for o ULTIMO DA LISTA
             {
                 void *anterior = *((void **)atual);
-                *((void **)anterior + sizeof(void *)) = NULL; // anterior aponta para null
-                *((void **)pBuffer + sizeof(void *)) = anterior;
+                *((void **)anterior + sizeof(void *)) = NULL;     // anterior->proximo = NULL
+                *((void **)pBuffer + sizeof(void *)) = anterior;  // pBuffer->Last = anterior
                 free(atual);
                 free(nome);
                 printf("Contato removido.\n");
                 return;
             }
         }
-        else if (*((void **)atual + sizeof(void *)) == NULL) // se nao encontrou o nome e chegou no fim da lista
+        else if (*((void **)atual + sizeof(void *)) == NULL) // se NAO ENCONTROU O NOME
         {
             printf("Contato nao encontrado.\n");
             return;
@@ -205,13 +213,13 @@ void listar(void *pBuffer)
             printf("Nome: %s\n", (char *)atual + 2 * sizeof(void *));
             printf("Idade: %s\n", (char *)atual + 2 * sizeof(void *) + 10 * sizeof(char));
             printf("Telefone: %s\n\n", (char *)atual + 2 * sizeof(void *) + 10 * sizeof(char) + 4 * sizeof(char));
-            if (*((void **)atual + sizeof(void *)) == NULL)
+            if (*((void **)atual + sizeof(void *)) == NULL) // se atual->proximo = NULL
             {
                 break;
             }
             else
             {
-                atual = *((void **)atual + sizeof(void *));
+                atual = *((void **)atual + sizeof(void *)); // atual = atual->proximo
             }
         }
     }
@@ -219,9 +227,9 @@ void listar(void *pBuffer)
 
 void excluirLista(void *primeiro)
 {
-    if (primeiro != NULL)
+    if (primeiro != NULL) // se nao chegou no fim da lista
     {
-        excluirLista(*((void **)primeiro + sizeof(void *)));
+        excluirLista(*((void **)primeiro + sizeof(void *))); // exclui o proximo nodo
         free(primeiro);
     }
 }
