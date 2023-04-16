@@ -123,9 +123,6 @@ bool leafSimilar(struct TreeNode* root1, struct TreeNode* root2)
     buscarFolhas(root1, folhas1, &tam1);
     buscarFolhas(root2, folhas2, &tam2);
 
-    printf("TAM1: %i\n", tam1);
-    printf("TAM2: %i\n", tam2);
-
     if (tam1 != tam2)
     {
         return false;
@@ -133,11 +130,10 @@ bool leafSimilar(struct TreeNode* root1, struct TreeNode* root2)
 
     for (int i = 0; i < tam1; i++)
     {
-        printf("Folha1: %i\n", *((int *)folhas1 + (1 * i)));
-        printf("Folha2: %i\n\n", *((int *)folhas2 + (1 * i)));
-
         if (*((int *)folhas1 + (1 * i)) != *((int *)folhas2 + (1 * i)))
         {
+            free(folhas1);
+            free(folhas2);
             return false;
         }
     }
@@ -154,9 +150,7 @@ void buscarFolhas(struct TreeNode *raiz, int *folhas, int *tam)
 
     if ((*raiz).left == NULL && (*raiz).right == NULL)
     {
-        printf("VALOR FOLHA: %i\n", (*raiz).val);
         *((int *)folhas + (1 * *tam)) = (*raiz).val;
-        printf("VALOR ARMAZENADO: %i\n", *((int *)folhas + (1 * *tam)));
         *tam = *tam + 1;
         return;
     }
