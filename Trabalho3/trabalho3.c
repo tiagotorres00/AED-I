@@ -138,6 +138,8 @@ bool leafSimilar(struct TreeNode* root1, struct TreeNode* root2)
         }
     }
 
+    free(folhas1);
+    free(folhas2);
     return true;
 }
 
