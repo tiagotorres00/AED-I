@@ -4,8 +4,6 @@
 #include <string.h>
 
 char ** removeAnagrams(char ** words, int wordsSize, int* returnSize);
-void swap(char *x, char *y);
-void quick_sort(char *word, int left, int right);
 
 int main(int argc, char const *argv[])
 {
