@@ -38,10 +38,12 @@ int main(int argc, char const *argv[])
     
     free(words);
     free(novaLista);
+    free(returnSize);
     return 0;
 }
 
-char ** removeAnagrams(char ** words, int wordsSize, int* returnSize){
+char ** removeAnagrams(char ** words, int wordsSize, int* returnSize)
+{
     int numeroDeAnagramas = 0;
 
     for (int i = wordsSize-1; i > 0; i--)
@@ -69,6 +71,7 @@ char ** removeAnagrams(char ** words, int wordsSize, int* returnSize){
             if (letrasPalavra1[j] != letrasPalavra2[j]) // Se houver mais aparicoes de uma letra qualquer na palavra1 que na 2, nao sao anagramas
             {
                 anagrama = false;
+                break;
             }
         }
 
