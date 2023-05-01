@@ -31,7 +31,7 @@ int main(void)
     folha1A1.right = NULL;
  
     folha2A1.val = 3;
-    folha2A1.left = NULL;
+    folha2A1.left = NULL; 
     folha2A1.right = NULL;
  
     // ---------------------------
